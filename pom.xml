@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.kamsspace</groupId>
-	<artifactId>financialdemo</artifactId>
+	<artifactId>ecommerce-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>financialdemo</name>
-	<description>Financial Demo project</description>
+	<name>ecommerceapp</name>
+	<description>Ecommerce Application project</description>
 	<url/>
 	<licenses>
 		<license/>
