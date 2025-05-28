@@ -17,10 +17,6 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-//    public CategoryController(CategoryService categoryService) {
-//        this.categoryService = categoryService;
-//    }
-
     @GetMapping("/public/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
