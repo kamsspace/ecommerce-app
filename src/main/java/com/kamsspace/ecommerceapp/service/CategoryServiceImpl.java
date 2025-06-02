@@ -1,12 +1,17 @@
 package com.kamsspace.ecommerceapp.service;
 
 import com.kamsspace.ecommerceapp.exception.APIException;
+import com.kamsspace.ecommerceapp.exception.ResourceNotFoundException;
 import com.kamsspace.ecommerceapp.model.Category;
 import com.kamsspace.ecommerceapp.payload.CategoryDTO;
 import com.kamsspace.ecommerceapp.payload.CategoryResponse;
 import com.kamsspace.ecommerceapp.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,9 +28,15 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryResponse getAllCategories() {
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-        List<Category> categories = categoryRepository.findAll();
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
+        List<Category> categories = categoryPage.getContent();
         if (categories.isEmpty()) {
             throw new APIException("No category created till now");
         }
@@ -36,6 +47,12 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.setContent(categoryDTOS);
+        categoryResponse.setPageNumber(categoryPage.getNumber());
+        categoryResponse.setPageSize(categoryPage.getSize());
+        categoryResponse.setTotalElements(categoryPage.getTotalElements());
+        categoryResponse.setTotalPages(categoryPage.getTotalPages());
+        categoryResponse.setLastPage(categoryPage.isLast());
+
         return categoryResponse;
     }
 
@@ -54,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDTO deleteCategory(Long categoryId) {
 
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
         categoryRepository.delete(category);
         return modelMapper.map(category, CategoryDTO.class);
@@ -63,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
         Category savedCategory = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         Category category = modelMapper.map(categoryDTO, Category.class);
         category.setCategoryId(categoryId);
         savedCategory = categoryRepository.save(category);
