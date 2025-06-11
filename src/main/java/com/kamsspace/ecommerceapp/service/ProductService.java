@@ -1,11 +1,10 @@
 package com.kamsspace.ecommerceapp.service;
 
-import com.kamsspace.ecommerceapp.model.Product;
 import com.kamsspace.ecommerceapp.payload.ProductDTO;
 import com.kamsspace.ecommerceapp.payload.ProductResponse;
 
 public interface ProductService {
-    ProductDTO addProduct(Product product, Long categoryId);
+    ProductDTO addProduct(ProductDTO product, Long categoryId);
 
     ProductResponse getAllProducts();
 
@@ -13,5 +12,7 @@ public interface ProductService {
 
     ProductResponse searchProductsByKeyword(String keyword);
 
-    ProductDTO updateProduct(Product product, Long productId);
+    ProductDTO updateProduct(ProductDTO product, Long productId);
+
+    ProductDTO deleteProduct(Long productId);
 }
